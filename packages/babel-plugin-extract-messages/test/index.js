@@ -32,6 +32,7 @@ function testCase(testName, assertion) {
     transformFileSync(path.join(__dirname, "fixtures", filename), {
       babelrc: false,
       plugins: [
+        "@babel/plugin-transform-typescript",
         ...(/integration.*\.js$/.test(filename)
           ? jsx
             ? [
@@ -213,5 +214,9 @@ describe("babel-plugin-lingui-extract-messages", function() {
       fs.readFileSync(path.join(buildDir, "jsx", "with-react.json"))
     )
     expect(messages).toMatchSnapshot()
+  })
+
+  testCase("should cope with typescript", transform => {
+    expect(transform("jsx/typescript.js")).not.toThrow()
   })
 })

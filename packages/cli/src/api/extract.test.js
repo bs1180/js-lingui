@@ -11,19 +11,15 @@ describe("extract", function() {
 
   beforeAll(() => {
     jest.doMock("./extractors/babel", () => ({
-      match: jest.fn(filename => filename.endsWith(".js")),
-      extract: jest.fn()
-    }))
-
-    jest.doMock("./extractors/typescript", () => ({
-      match: jest.fn(filename => filename.endsWith(".ts")),
+      match: jest.fn(
+        filename => filename.endsWith(".js") || filename.endsWith(".ts")
+      ),
       extract: jest.fn()
     }))
 
     // load before mocking FS
     extract = require("./extract").extract
     babel = require("./extractors/babel")
-    typescript = require("./extractors/typescript")
 
     mockFs({
       src: {
@@ -53,7 +49,7 @@ describe("extract", function() {
       ignore: ["forbidden"]
     })
 
-    expect(typescript.match).toHaveBeenCalledWith(
+    expect(babel.match).toHaveBeenCalledWith(
       path.join("src", "components", "Typescript.ts")
     )
     expect(babel.match).toHaveBeenCalledWith(
@@ -70,16 +66,7 @@ describe("extract", function() {
       path.join("src", "components", "Babel.js"),
       "locale"
     )
-    expect(babel.extract).not.toHaveBeenCalledWith(
-      path.join("src", "components", "Typescript.ts"),
-      "locale"
-    )
-
-    expect(typescript.extract).not.toHaveBeenCalledWith(
-      path.join("src", "components", "Babel.js"),
-      "locale"
-    )
-    expect(typescript.extract).toHaveBeenCalledWith(
+    expect(babel.extract).toHaveBeenCalledWith(
       path.join("src", "components", "Typescript.ts"),
       "locale"
     )
